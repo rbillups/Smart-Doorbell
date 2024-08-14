@@ -1,44 +1,65 @@
 #!/usr/bin/env python
 import smtplib
-from email.MIMEMultipart import MIMEMultipart
-from email.MIMEBase import MIMEBase
-from email.MIMEText import MIMEText
-from email.Utils import COMMASPACE, formatdate
-from email import Encoders
+from email.message import EmailMessage
+import ssl
+from email.mime.text import MIMEText
+from email.mime.image import MIMEImage
 import os
 
-USERNAME = "bisuefy16@gmail.com"
-PASSWORD = "gopalogovinda"
+def send_email_route():
+    recipient_email = 'rkbillups2@gmail.com'
+    print(f'User Input: {recipient_email}')
+    
+    try:
+        send_email(recipient_email)
+        return "Email sent successfully!"
+    except Exception as e:
+        print(f"Failed to send email: {e}")
+        return "Failed to send email."
 
-def sendMail(to, subject, text, files=[]):
-    assert type(to)==list
-    assert type(files)==list
+def send_email(email):
+    smtp_server = 'smtp.gmail.com'
+    smtp_port = 587
+    smtp_username = 'saintkeyproducts@gmail.com'
+    smtp_password = 'iche mpdv ztvr tveb'
+    current_dir = os.getcwd()
+    image_path = os.path.join(current_dir, 'nks.jpg')
+    
+    # Print the current directory and image path
+    print(f'Current Directory: {current_dir}')
+    print(f'Image Path: {image_path}')
 
-    msg = MIMEMultipart()
-    msg['From'] = USERNAME
-    msg['To'] = COMMASPACE.join(to)
-    msg['Date'] = formatdate(localtime=True)
-    msg['Subject'] = subject
+    admin_message = MIMEText('Someone is at your doorbell')
+    admin_message['Subject'] = 'Security Alert: User Detected'
+    admin_message['From'] = smtp_username
+    admin_message['To'] = 'rkbillups2@gmail.com'
 
-    msg.attach( MIMEText(text) )
+    # Attach the image
+    with open(image_path, 'rb') as img:
+        img_data = img.read()
+        img_name = image_path.split('/')[-1]
+        admin_message.add_attachment(img_data, maintype='image', subtype='jpeg', filename=img_name)
 
-    for file in files:
-        part = MIMEBase('application', "octet-stream")
-        part.set_payload( open(file,"rb").read() )
-        Encoders.encode_base64(part)
-        part.add_header('Content-Disposition', 'attachment; filename="%s"'
-                       % os.path.basename(file))
-        msg.attach(part)
+    context = ssl.create_default_context()
 
-	server = smtplib.SMTP('smtp.gmail.com:587')
-	server.ehlo_or_helo_if_needed()
-	server.starttls()
-	server.ehlo_or_helo_if_needed()
-	server.login(USERNAME,PASSWORD)
-	server.sendmail(USERNAME, to, msg.as_string())
-	server.quit()
+    try:
+        with smtplib.SMTP('smtp.gmail.com', 587) as smtp:
+            smtp.ehlo()
+            smtp.starttls(context=context)
+            smtp.ehlo()
+            smtp.login(smtp_username, smtp_password)
+            smtp.sendmail(smtp_username, 'rkbillups2@gmail.com', admin_message.as_string())
+            smtp.quit()
+    except smtplib.SMTPException as e:
+        print(f"SMTP error occurred: {e}")
+        raise
+    
+    print("Emails sent successfully")
 
-sendMail( ["biswajit.das@efy.in"],
-        "Doorbell notification",
-        "Someone is ringing the doorbell, picture attached",
-        ["/home/pi/my_project/nks.jpg"] )
+
+def main():
+    result = send_email_route()
+    print(result)
+
+if __name__ == "__main__":
+    main()

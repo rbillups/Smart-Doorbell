@@ -1,6 +1,7 @@
 import RPi.GPIO as GPIO
 import time
 import os
+import emailscript
 
 # Set up GPIO
 GPIO.setmode(GPIO.BCM)
@@ -21,7 +22,9 @@ try:
             print("button pressed")
             # Capture image and run email script
             #os.system("fswebcam -r 960x720 -d /dev/video0 /home/pi/my_project/nks.jpg")
-            os.system("python /home/pi/my_project/emailscript.py")
+            #os.system("python /home/pi/my_project/emailscript.py")
+
+            emailscript.send_email_route()
         time.sleep(0.1)  # Add a small delay to debounce
 except KeyboardInterrupt:
     # Clean up GPIO on exit
