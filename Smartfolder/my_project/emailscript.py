@@ -29,27 +29,35 @@ def send_email(email):
     print(f'Current Directory: {current_dir}')
     print(f'Image Path: {image_path}')
 
-    admin_message = MIMEText('Someone is at your doorbell')
-    admin_message['Subject'] = 'Security Alert: User Detected'
-    admin_message['From'] = smtp_username
-    admin_message['To'] = 'rkbillups2@gmail.com'
+    subject = 'Security Alert: User Detected'
+    body = """Hello, this user is at your doorbell"""
+
+    user_message = MIMEText(body)
+    user_message['Subject'] =     subject 
+    user_message['From'] = smtp_username
+    user_message['To'] = 'jboogie0123@gmail.com'
+
+    print("in email"+ user_message.as_string())
 
     # Attach the image
     with open(image_path, 'rb') as img:
         img_data = img.read()
         img_name = image_path.split('/')[-1]
-        admin_message.add_attachment(img_data, maintype='image', subtype='jpeg', filename=img_name)
+        user_message.add_attachment(img_data, maintype='image', subtype='jpeg', filename=img_name)
 
     context = ssl.create_default_context()
 
     try:
-        with smtplib.SMTP('smtp.gmail.com', 587) as smtp:
-            smtp.ehlo()
-            smtp.starttls(context=context)
-            smtp.ehlo()
-            smtp.login(smtp_username, smtp_password)
-            smtp.sendmail(smtp_username, 'rkbillups2@gmail.com', admin_message.as_string())
-            smtp.quit()
+        # Establish a connection to the SMTP server
+        smtp_connection = smtplib.SMTP(smtp_server, smtp_port)
+        smtp_connection.ehlo()
+        smtp_connection.starttls()
+        smtp_connection.ehlo()
+        smtp_connection.login(smtp_username, smtp_password)
+
+        # Send the emails
+        smtp_connection.sendmail(smtp_username, 'jboogie0123@gmail.com', user_message.as_string())
+        smtp_connection.quit()
     except smtplib.SMTPException as e:
         print(f"SMTP error occurred: {e}")
         raise
