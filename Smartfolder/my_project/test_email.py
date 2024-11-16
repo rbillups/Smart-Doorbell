@@ -2,7 +2,8 @@
 import smtplib
 from email.message import EmailMessage
 import ssl
-
+import smtplib
+from email.mime.text import MIMEText
 def send_email_route():
     recipient_email = 'rkbillups2@gmail.com'
     print(f'User Input: {recipient_email}')
@@ -18,25 +19,45 @@ def send_email(email):
     email_sender = 'saintkeyproducts@gmail.com'
     email_password = 'xdlc yogk hhpl apda'
     email_receiver = email
+    smtp_server = 'smtp.gmail.com'
+    smtp_port = 587
 
     subject = 'Security Alert: User Detected'
     body = """Hello, this user is at your doorbell"""
 
-    em = EmailMessage()
-    em['From'] = email_sender
-    em['To'] = email_receiver
-    em['Subject'] = subject
-    em.set_content(body)
+    user_message = MIMEText(body)
+    user_message['Subject'] =     subject 
+    user_message['From'] = email_sender
+    user_message['To'] = 'jboogie0123@gmail.com'
+
+    print("in email"+ user_message.as_string())
+
+    # Establish a connection to the SMTP server
+    smtp_connection = smtplib.SMTP(smtp_server, smtp_port)
+    smtp_connection.ehlo()
+    smtp_connection.starttls()
+    smtp_connection.ehlo()
+    smtp_connection.login(email_sender, email_password)
+
+    # Send the emails
+    smtp_connection.sendmail(email_sender, 'jboogie0123@gmail.com', user_message.as_string())
+    smtp_connection.quit()
 
     context = ssl.create_default_context()
 
-    try:
-        with smtplib.SMTP_SSL('smtp.gmail.com', 587, context=context) as smtp:
-            smtp.login(email_sender, email_password)
-            smtp.sendmail(email_sender, email_receiver, em.as_string())
-    except smtplib.SMTPException as e:
-        print(f"SMTP error occurred: {e}")
-        raise
+    # try:
+    #     smtp_connection = smtplib.SMTP(smtp_server, smtp_port)
+    #     smtp_connection.ehlo()
+    #     smtp_connection.starttls()
+    #     smtp_connection.ehlo()
+    #     smtp_connection.login(email_sender, email_password)
+
+    #     # Send the emails
+    #     smtp_connection.sendmail(email_sender, 'rkbillups2@gmail.com', user_message.as_string())
+    #     smtp_connection.quit()
+    # except smtplib.SMTPException as e:
+    #     print(f"SMTP error occurred: {e}")
+    #     raise
 
 def main():
     result = send_email_route()

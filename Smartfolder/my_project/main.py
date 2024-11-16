@@ -2,7 +2,7 @@ import RPi.GPIO as GPIO
 import time
 import os
 import emailscript
-
+import sms_script
 # Set up GPIO
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)  # Disable warnings
@@ -21,10 +21,16 @@ try:
         if GPIO.input(buttonPin) or GPIO.input(buttonPina):
             print("button pressed")
             # Capture image and run email script
-            #os.system("fswebcam -r 960x720 -d /dev/video0 /home/pi/my_project/nks.jpg")
-            #os.system("python /home/pi/my_project/emailscript.py")
 
-            emailscript.send_email_route()
+            image_path = "/home/pi/my_project/visitor.jpg"
+            os.system(f"libcamera-still -o {image_path}")
+            
+            print(f"Image saved at {image_path}")
+
+            # Send SMS with image
+            sms_script.send_sms_with_image(image_path)
+
+            #emailscript.send_email_route()
         time.sleep(0.1)  # Add a small delay to debounce
 except KeyboardInterrupt:
     # Clean up GPIO on exit
