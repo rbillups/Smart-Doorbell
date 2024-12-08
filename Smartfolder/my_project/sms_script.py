@@ -3,8 +3,8 @@ from twilio.rest import Client
 from flask import Flask, request
 
 # Twilio configuration
-TWILIO_ACCOUNT_SID = "AC4bc5567012fb5deaae34fa9f6f22aa05"
-TWILIO_AUTH_TOKEN = "ce17ac5dfdd6c8dcea27e8817388a658"
+TWILIO_ACCOUNT_SID = ""
+TWILIO_AUTH_TOKEN = ""
 TWILIO_PHONE_NUMBER = "+18662374849"
 USER_PHONE_NUMBER = "4046839747"
 
